@@ -63,6 +63,65 @@
       font-weight: 600;
       color: var(--primary);
       font-size: 0.95rem;
+      position: relative;
+    }
+
+    /* Estilos do Ícone de Informação */
+    .info-icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      font-style: normal;
+      cursor: help;
+      margin-left: 8px;
+      line-height: 16px;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .info-icon:hover {
+      background: var(--secondary);
+    }
+
+    .info-tooltip {
+      visibility: hidden;
+      width: 220px;
+      background: var(--primary);
+      color: white;
+      text-align: left;
+      border-radius: 6px;
+      padding: 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 150%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .info-icon:hover .info-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .info-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -6px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: var(--primary) transparent transparent transparent;
     }
 
     select, input[type="text"] {
@@ -211,6 +270,11 @@
       th, td {
         padding: 0.6rem;
       }
+
+      .info-tooltip {
+        width: 180px;
+        font-size: 0.8rem;
+      }
     }
 
     .button-container {
@@ -284,7 +348,24 @@
       container.className = "campo";
 
       const label = document.createElement("label");
-      label.innerText = campo;
+      
+      // Adiciona ícone de informação para origem1
+      if (campo === "origem1") {
+        label.innerHTML = `
+          ${campo}
+          <span class="info-icon">
+            i
+            <div class="info-tooltip">
+              🎚️ Faixa de Preço<br><br>
+              Selecione o intervalo de valores desejado utilizando os controles deslizantes.<br>
+              <em>Intervalo permitido: 0 a 100</em>
+            </div>
+          </span>
+        `;
+      } else {
+        label.textContent = campo;
+      }
+      
       container.appendChild(label);
       container.appendChild(document.createElement("br"));
 
@@ -300,7 +381,7 @@
         const input = document.createElement("input");
         input.type = "text";
         input.id = campo;
-        input.placeholder = "Digite qualquer valor";
+        input.placeholder = "Ex: Piloto NE";
         input.style.width = "220px";
         container.appendChild(input);
       } else if (campo === "periodo" || campo === "origem1") {
@@ -486,6 +567,5 @@
       });
     }
   </script>
-
 </body>
 </html>
