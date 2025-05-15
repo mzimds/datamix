@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataMix - Gerador de Combinações</title>
+  <style>
+    :root {
+      --primary: #2A5C82;
+      --secondary: #5BA4E6;
+      --background: #f8f9fa;
+      --text: #2c3e50;
+      --border: #dee2e6;
+      --hover: #e9ecef;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #listas-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .campo {
+      background: white;
+      border-radius: 10px;
+      padding: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .campo:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .campo label {
+      display: block;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.8rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    select {
+      height: 150px;
+      background: white;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--secondary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(91, 164, 230, 0.2);
+    }
+
+    input[type="text"] {
+      height: auto;
+      background: #fff;
+    }
+
+    input[type="text"]::placeholder {
+      color: #6c757d;
+      opacity: 0.7;
+    }
+
+    .slider-container {
+      margin-top: 0.5rem;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      margin: 1rem 0;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--secondary);
+    }
+
+    .range-value {
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+      margin-top: -0.5rem;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #resultado {
+      margin-top: 2rem;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    th, td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover {
+      background: var(--hover);
+    }
+
+    @media (max-width: 768px) {
+      #listas-container {
+        grid-template-columns: 1fr;
+      }
+      
+      button {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+      }
+      
+      table {
+        font-size: 0.9rem;
+      }
+      
+      th, td {
+        padding: 0.6rem;
+      }
+    }
+
+    .button-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>DataMix</h2>
+
+  <div id="listas-container"></div>
+
+  <div class="button-container">
+    <button onclick="gerarCombinacoes()">⚡ Gerar Combinações</button>
+    <button onclick="exportarCSV()">📤 Exportar CSV</button>
+    <button onclick="limparCombinacoes()">🧹 Limpar Tudo</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    const campos = [
+      "mes", "periodo","tipo_entrada","ddd","canal_n0","canal_n2","movimento","origem1",
+       "origem2","produto","plano","ticket"];
+
+    const opcoesPorCampo = {
+      canal_n0: ["Consumer", "Custumer Relations", "Marketing"],
+      canal_n2: ["App Meu TIM", "Captive", "Canais Automáticos",
+       "Dir/Org/Referral", "DMA", "Email", "Inbound Cross Selling",
+        "Inbound/Outros", "Loja Própria", "Mídia Paga", "Outbound",
+         "Retail", "SMS", "Televendas", "Varejo", "Whatsapp"],
+         tipo_entrada: ["Gross","Migração"],
+      plano: ["Black A", "Black B", "Black C", "BTL A", "BTL B", "BTL C", "BTL C Disney",
+       "Ctrl A", "Ctrl A Esp", "Ctrl A Exp", "Ctrl B", "Ctrl B Esp", "Ctrl B Exp",
+        "Ctrl B Exp 6.1", "Ctrl B Exp 7.1", "Ctrl B express 7.2", "Ctrl C Exp 6.0",
+         "Ctrl C Exp 6.1", "Ctrl C Exp 7.0", "Ctrl C Exp 7.1",
+          "Ctrl C express 7.2", "Ctrl D Exp", "Ctrl D Exp 7.0", "Ctrl E Exp",
+           "Ctrl E Exp 7.0", "Ctrl F Exp", "Ctrl F Exp 7.0", "Ctrl H Exp", "Ctrl H Exp 7.0",
+            "Ctrl I Exp", "Ctrl Ilimitado", "Ctrl J Exp", "Ctrl J Exp 6.0", "Ctrl J Exp 7.0",
+             "Ctrl L Exp", "Ctrl L Exp 7.0", "Ctrl Light", "Ctrl Redes Sociais", "Ctrl Smart",
+              "Ctrl Smart Flex", "Ctrl Top", "Familia Dep", "Giga A 2.0",
+               "Giga A Especial 2.0", "Giga B Promo", "Mais A", "Mais B",
+                "Mais C", "Mais Ctrl A Exp", "Mais Ctrl B Exp", "Mais Ctrl C Exp",
+                 "Mais D", "Multi A", "Multi A One", "Multi B", "Multi C", "Multi C One",
+                  "Multi D", "Outros Ctrl", "Pós A Exp", "Pós B Exp", "Pós C Exp", "Pós D Exp",
+                   "Pós E Exp", "Pós F Exp", "Pós Outros", "Tim Black", "Tim Black Plus", "Tim Black Premium",
+                    "Tim Ctrl", "Tim Ctrl Plus", "Tim Ctrl Premium"],
+      mes: ["202512", "202511", "202510", "202509", "202508", "202507",
+       "202506", "202505", "202504", "202503", "202502", "202501", "202412",
+        "202411", "202410", "202409", "202408", "202407", "202406", "202405",
+         "202404", "202403", "202402", "202401"],
+      ddd: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24",
+       "27", "28", "31", "32", "33", "34", "35", "37", "38", "41", "42", "43", "44",
+        "45", "46", "47", "48", "49", "51", "53", "54", "55", "61", "62", "63", "64",
+         "65", "66", "67", "68", "69", "71", "73", "74", "75", "77", "79", "81", "82",
+          "83", "84", "85", "86", "87", "88", "89", "91", "92", "93", "94", "95", "96",
+           "97", "98", "99"],
+      movimento: ["Ctrl > Ctrl", "Ctrl > Pos", "Pos > Pos", "Pre > Ctrl","Gross","Portin"],
+      produto: ["Ctrl", "Pos"]
+    };
+
+    const listasContainer = document.getElementById("listas-container");
+
+    campos.forEach(campo => {
+      const container = document.createElement("div");
+      container.className = "campo";
+
+      const label = document.createElement("label");
+      label.innerText = campo;
+      container.appendChild(label);
+      container.appendChild(document.createElement("br"));
+
+      if (campo === "ticket") {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = campo;
+        input.placeholder = "Ex: 100.00";
+        input.title = "Use o formato 100.00 com ponto (não vírgula)";
+        input.style.width = "220px";
+        container.appendChild(input);
+      } else if (campo === "origem2") {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = campo;
+        input.placeholder = "Digite qualquer valor";
+        input.style.width = "220px";
+        container.appendChild(input);
+      } else if (campo === "periodo" || campo === "origem1") {
+        const sliderContainer = document.createElement("div");
+        sliderContainer.className = "slider-container";
+
+        const min = campo === "origem1" ? 0 : 1;
+        const max = campo === "origem1" ? 100 : 31;
+        const initialEnd = campo === "origem1" ? 100 : 31;
+
+        const labelInicio = document.createElement("span");
+        labelInicio.className = "slider-label";
+        labelInicio.innerText = "Início:";
+        sliderContainer.appendChild(labelInicio);
+
+        const range1 = document.createElement("input");
+        range1.type = "range";
+        range1.min = min;
+        range1.max = max;
+        range1.value = min;
+        range1.id = `${campo}Inicio`;
+        sliderContainer.appendChild(range1);
+
+        const labelFim = document.createElement("span");
+        labelFim.className = "slider-label";
+        labelFim.innerText = "Fim:";
+        sliderContainer.appendChild(labelFim);
+
+        const range2 = document.createElement("input");
+        range2.type = "range";
+        range2.min = min;
+        range2.max = max;
+        range2.value = initialEnd;
+        range2.id = `${campo}Fim`;
+        sliderContainer.appendChild(range2);
+
+        const rangeDisplay = document.createElement("div");
+        rangeDisplay.className = "range-value";
+        rangeDisplay.id = `${campo}Display`;
+        rangeDisplay.innerText = `${min} - ${initialEnd}`;
+        sliderContainer.appendChild(rangeDisplay);
+
+        function atualizarDisplay() {
+          let inicio = parseInt(range1.value);
+          let fim = parseInt(range2.value);
+          if (inicio > fim) [inicio, fim] = [fim, inicio];
+          document.getElementById(`${campo}Display`).innerText = `${inicio} - ${fim}`;
+        }
+
+        range1.addEventListener("input", atualizarDisplay);
+        range2.addEventListener("input", atualizarDisplay);
+
+        container.appendChild(sliderContainer);
+      } else {
+        const select = document.createElement("select");
+        select.id = campo;
+        select.multiple = true;
+
+        const opcaoTodos = document.createElement("option");
+        opcaoTodos.value = "*";
+        opcaoTodos.text = "Selecionar Todos";
+        select.appendChild(opcaoTodos);
+
+        const opcoes = opcoesPorCampo[campo] || [];
+        opcoes.forEach(op => {
+          const opt = document.createElement("option");
+          opt.value = op;
+          opt.text = op;
+          select.appendChild(opt);
+        });
+
+        select.addEventListener("change", function () {
+          if (this.value === "*") {
+            for (let i = 0; i < this.options.length; i++) {
+              this.options[i].selected = this.options[i].value !== "*";
+            }
+          }
+        });
+
+        container.appendChild(select);
+      }
+
+      listasContainer.appendChild(container);
+    });
+
+    function obterOpcoes(id) {
+      if (id === "ticket") {
+        const valor = document.getElementById(id).value.trim();
+        const regex = /^\d+(\.\d{2})$/;
+        if (!regex.test(valor)) {
+          alert("O valor do campo 'Ticket' deve estar no formato 100.00 (com ponto, não vírgula).");
+          throw new Error("Formato de ticket inválido");
+        }
+        return [valor];
+      }
+      
+      if (id === "origem2") {
+        return [document.getElementById(id).value.trim()];
+      }
+
+      if (id === "periodo" || id === "origem1") {
+        let inicio = parseInt(document.getElementById(`${id}Inicio`).value);
+        let fim = parseInt(document.getElementById(`${id}Fim`).value);
+        if (inicio > fim) [inicio, fim] = [fim, inicio];
+        return [`${inicio} - ${fim}`];
+      }
+
+      const element = document.getElementById(id);
+      const selecionados = Array.from(element.selectedOptions).map(opt => opt.value);
+      if (selecionados.includes("*")) {
+        return Array.from(element.options)
+          .map(opt => opt.value)
+          .filter(v => v !== "*");
+      }
+      return selecionados;
+    }
+
+    function gerarCombinacoes() {
+      let todasOpcoes;
+      try {
+        todasOpcoes = campos.map(campo => obterOpcoes(campo));
+      } catch (erro) {
+        return;
+      }
+
+      if (todasOpcoes.some(lista => lista.length === 0)) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+      }
+
+      function combinar(arrays, prefix = []) {
+        if (!arrays.length) return [prefix];
+        const [first, ...rest] = arrays;
+        return first.flatMap(valor => combinar(rest, [...prefix, valor]));
+      }
+
+      const combinacoes = combinar(todasOpcoes);
+
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.innerHTML = `<p><strong>Total de linhas:</strong> ${combinacoes.length}</p>`;
+
+      let html = `<table><thead><tr>${campos.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>`;
+      combinacoes.forEach(linha => {
+        html += "<tr>" + linha.map(v => `<td>${v}</td>`).join("") + "</tr>";
+      });
+      html += "</tbody></table>";
+
+      resultadoDiv.innerHTML += html;
+      window._dadosCSV = combinacoes;
+    }
+
+    function exportarCSV() {
+      if (!window._dadosCSV || window._dadosCSV.length === 0) {
+        alert("Gere as combinações antes de exportar.");
+        return;
+      }
+
+      let csv = campos.join(",") + "\n";
+      window._dadosCSV.forEach(linha => {
+        csv += linha.map(v => `"${v}"`).join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "combinacoes.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function limparCombinacoes() {
+      document.getElementById("resultado").innerHTML = "";
+      campos.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+          if (element.tagName === "SELECT") {
+            Array.from(element.options).forEach(opt => (opt.selected = false));
+          } else if (element.tagName === "INPUT") {
+            element.value = "";
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
