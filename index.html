@@ -486,6 +486,7 @@
         let inicio = parseInt(document.getElementById(`${id}Inicio`).value);
         let fim = parseInt(document.getElementById(`${id}Fim`).value);
         if (inicio > fim) [inicio, fim] = [fim, inicio];
+        if (inicio === 0 && fim === 100) return [""];
         return [`${inicio} - ${fim}`];
       }
 
